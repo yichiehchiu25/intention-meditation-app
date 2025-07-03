@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, 
-TextInput, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, ScrollView, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 interface Intention {
@@ -12,10 +11,8 @@ interface Intention {
 }
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = 
-useState<'home' | 'create' | 'timer'>('home');
-  const [intentions, setIntentions] = 
-useState<Intention[]>([]);
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'create' | 'timer'>('home');
+  const [intentions, setIntentions] = useState<Intention[]>([]);
   const [newIntention, setNewIntention] = useState({
     appName: '',
     intention: '',
@@ -23,50 +20,48 @@ useState<Intention[]>([]);
   });
 
   const createIntention = () => {
-    if (newIntention.appName && newIntention.intention) {
+    console.log('按鈕被點擊了！'); // 調試用
+    console.log('當前數據:', newIntention); // 調試用
+    
+    if (newIntention.appName.trim() && newIntention.intention.trim()) {
       const intention: Intention = {
         id: Date.now().toString(),
-        appName: newIntention.appName,
-        intention: newIntention.intention,
+        appName: newIntention.appName.trim(),
+        intention: newIntention.intention.trim(),
         duration: newIntention.duration,
         timestamp: new Date()
       };
-      setIntentions([...intentions, intention]);
-      setNewIntention({ appName: '', intention: '', 
-duration: 10 });
+      setIntentions(prev => [...prev, intention]);
+      setNewIntention({ appName: '', intention: '', duration: 10 });
       setCurrentScreen('home');
+      console.log('意圖已建立:', intention); // 調試用
+    } else {
+      console.log('表單驗證失敗 - 缺少必填欄位'); // 調試用
+      alert('請填寫所有必填欄位！');
     }
   };
 
   const HomeScreen = () => (
     <View style={styles.container}>
       <Text style={styles.title}>正念使用意圖</Text>
-      <Text 
-style={styles.subtitle}>在使用社群媒體前，設定你的使用意圖</Text>
+      <Text style={styles.subtitle}>在使用社群媒體前，設定你的使用意圖</Text>
       
       <TouchableOpacity 
         style={styles.primaryButton}
         onPress={() => setCurrentScreen('create')}
       >
-        <Text 
-style={styles.buttonText}>設定新的使用意圖</Text>
+        <Text style={styles.buttonText}>設定新的使用意圖</Text>
       </TouchableOpacity>
 
       {intentions.length > 0 && (
         <View style={styles.intentionsContainer}>
-          <Text 
-style={styles.sectionTitle}>最近的意圖</Text>
+          <Text style={styles.sectionTitle}>最近的意圖</Text>
           <ScrollView style={styles.intentionsList}>
-            
-{intentions.slice(-3).reverse().map((intention) => (
-              <View key={intention.id} 
-style={styles.intentionCard}>
-                <Text 
-style={styles.appName}>{intention.appName}</Text>
-                <Text 
-style={styles.intentionText}>{intention.intention}</Text>
-                <Text 
-style={styles.duration}>{intention.duration} 分鐘</Text>
+            {intentions.slice(-3).reverse().map((intention) => (
+              <View key={intention.id} style={styles.intentionCard}>
+                <Text style={styles.appName}>{intention.appName}</Text>
+                <Text style={styles.intentionText}>{intention.intention}</Text>
+                <Text style={styles.duration}>{intention.duration} 分鐘</Text>
               </View>
             ))}
           </ScrollView>
@@ -84,30 +79,29 @@ style={styles.duration}>{intention.duration} 分鐘</Text>
         <TextInput
           style={styles.input}
           value={newIntention.appName}
-          onChangeText={(text) => 
-setNewIntention({...newIntention, appName: text})}
+          onChangeText={(text) => setNewIntention(prev => ({...prev, appName: text}))}
           placeholder="例如：Instagram, Facebook, TikTok"
+          autoFocus={false}
         />
 
         <Text style={styles.label}>使用意圖</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
           value={newIntention.intention}
-          onChangeText={(text) => 
-setNewIntention({...newIntention, intention: text})}
+          onChangeText={(text) => setNewIntention(prev => ({...prev, intention: text}))}
           placeholder="我想要..."
-          multiline
+          multiline={true}
           numberOfLines={3}
         />
 
-        <Text 
-style={styles.label}>預計使用時間（分鐘）</Text>
+        <Text style={styles.label}>預計使用時間（分鐘）</Text>
         <TextInput
           style={styles.input}
           value={newIntention.duration.toString()}
-          onChangeText={(text) => 
-setNewIntention({...newIntention, duration: parseInt(text) 
-|| 10})}
+          onChangeText={(text) => {
+            const numValue = parseInt(text) || 10;
+            setNewIntention(prev => ({...prev, duration: numValue}));
+          }}
           keyboardType="numeric"
         />
 
@@ -122,8 +116,7 @@ setNewIntention({...newIntention, duration: parseInt(text)
           style={styles.secondaryButton}
           onPress={() => setCurrentScreen('home')}
         >
-          <Text 
-style={styles.secondaryButtonText}>返回</Text>
+          <Text style={styles.secondaryButtonText}>返回</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -246,9 +239,12 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     marginBottom: 20,
     fontSize: 16,
+    minHeight: 40,
+    outlineStyle: 'none', // Web 特定：移除預設的 outline
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
+    paddingTop: 12, // 確保文字從頂部開始
   },
 });
