@@ -82,6 +82,7 @@ export default function App() {
           onChangeText={(text) => setNewIntention(prev => ({...prev, appName: text}))}
           placeholder="例如：Instagram, Facebook, TikTok"
           autoFocus={false}
+          returnKeyType="next"
         />
 
         <Text style={styles.label}>使用意圖</Text>
@@ -92,6 +93,7 @@ export default function App() {
           placeholder="我想要..."
           multiline={true}
           numberOfLines={3}
+          returnKeyType="done"
         />
 
         <Text style={styles.label}>預計使用時間（分鐘）</Text>
@@ -99,10 +101,11 @@ export default function App() {
           style={styles.input}
           value={newIntention.duration.toString()}
           onChangeText={(text) => {
-            const numValue = parseInt(text) || 10;
+            const numValue = parseInt(text) || 0;
             setNewIntention(prev => ({...prev, duration: numValue}));
           }}
           keyboardType="numeric"
+          returnKeyType="done"
         />
 
         <TouchableOpacity 
@@ -240,11 +243,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 16,
     minHeight: 40,
-    outlineStyle: 'none', // Web 特定：移除預設的 outline
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
-    paddingTop: 12, // 確保文字從頂部開始
+    paddingTop: 12,
   },
 });
